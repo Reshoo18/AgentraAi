@@ -5,7 +5,7 @@ const userSchema= new  mongoose.Schema(
     {
         fireBaseUid:{
           type:String,
-          unique
+          unique:true
         },
     name:String,
     email:String,

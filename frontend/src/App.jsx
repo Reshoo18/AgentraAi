@@ -1,15 +1,25 @@
 import React from 'react'
 import {signInWithPopup} from 'firebase/auth'
 import { auth, googleProvider } from './utils/firebase'
+import api from './utils/axios'
+import Home from './pages/Home.jsx'
+import { useEffect } from 'react'
+import getCurrentUser from '../../backend/gateway/controllers/user.controller.js'
 
-const googleLogin =async ()=>{
- const data= await signInWithPopup(auth,googleProvider)
-}
+
 const App = () => {
+  useEffect(()=>{
+    const getUser=async()=>{
+      await getCurrentUser()
+    }
+    getUser()
+  },[])
+
   return (
-    <div className=' bg-black h-screen w-full flex items-center justify-center'>
-     <button className='w-50 bg-white h-24 ' onClick={googleLogin}>continue with google</button>
-    </div>
+    <>
+     <Home />
+    </>
+  
   )
 }
 
