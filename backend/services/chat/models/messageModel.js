@@ -7,7 +7,7 @@ const messageSchema=new mongoose.Schema({
        ref:"Conversation"
 
    },
-   rple:{
+   role:{
     type:String,
    enum:["user","assistant"]
    },
