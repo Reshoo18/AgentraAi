@@ -5,6 +5,7 @@ import cors from "cors"
 import getCurrentUser from "./controllers/user.controller.js"
 import protect from "./middleware/authMiddleware.js"
 import cookieParser from "cookie-parser"
+import proxyWithHeader from "./utils/proxyWithHeader.js"
 dotenv.config()
 
 const app=express()

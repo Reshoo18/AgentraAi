@@ -1,8 +1,8 @@
 
 
-const agent=async(req,res)=>{
+export const agent=async(req,res)=>{
     try {
-        const {prompt,conversationId}
+        const {prompt,conversationId}=req.body
         await axios.post(`${process.env.CHAT_SERVICE}/save-message`,{
             conversationId,role:"user",content:prompt
 
@@ -18,3 +18,4 @@ const agent=async(req,res)=>{
         return res.status(500).json({message:`agent error ${agent}`})
     }
 }
+

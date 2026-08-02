@@ -1,7 +1,7 @@
 import Conversation from "../models/conversationModel.js"
 import Message from "../models/messageModel.js"
 
-export const createConversation =async ()=>{
+export const createConversation =async (req,res)=>{
     try {
        const userID= req.headers["x-user-id"]
 
@@ -19,7 +19,7 @@ export const createConversation =async ()=>{
     }
 }
 
-export const getConversations =async ()=>{
+export const getConversations =async (req,res)=>{
     try {
        const userID= req.headers["x-user-id"]
 

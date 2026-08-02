@@ -4,7 +4,12 @@ const proxyWithHeader=(serviceUrl)=>{
 
     return proxy(serviceUrl,{
         proxyReqOptDecorator:(proxyReqOpts,srcReq)=>{
-            proxyReqOpts.headers["x-user-id"]=srcReq.user.userID
+          if(srcReq.user){
+              proxyReqOpts.headers["x-user-id"]=srcReq.user.userID
+          }
+          return proxyReqOpts
         }
     })
 }
+
+export default proxyWithHeader
