@@ -1,4 +1,5 @@
-
+import axios from "axios";
+import { graph } from "../graph/graphs.js";
 
 export const agent=async(req,res)=>{
     try {
@@ -15,7 +16,12 @@ export const agent=async(req,res)=>{
     return res.status(200).json(response)
         
     } catch (error) {
-        return res.status(500).json({message:`agent error ${agent}`})
-    }
+  console.error("AGENT ERROR:", error);
+
+  return res.status(500).json({
+    message: error.message,
+    stack: error.stack,
+  });
+}
 }
 

@@ -64,7 +64,7 @@ const SideBar = () => {
         </button>
         
         
-        <div className="flex-1 overflow-y-auto px-2.5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex-1 overflow-y-auto px-2.5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden pt-5">
           {conversations.map((conv, i) => {
             const isActive = selectedConversation?._id == conv?._id;
             return (
@@ -77,7 +77,7 @@ const SideBar = () => {
                 }`}
               >
                 <div
-                  className={`flex items-center justify-center shrink-0 w-[28px] h-[28px] rounded-lg transition-colors duration-150 ${
+                  className={`flex items-center justify-center shrink-0 w-[20px] h-[20px] rounded-lg transition-colors duration-150 ${
                     isActive
                       ? "bg-indigo-500/15 text-indigo-400"
                       : "bg-white/[0.05] text-slate-500"
@@ -91,6 +91,21 @@ const SideBar = () => {
             );
           })}
         </div>
+
+        <div className="relative shrink-0">
+                {userData.avatar && !imageError ? (
+                  <img
+                    className="w-9 h-9 rounded-[10px] object-cover border-2 border-indigo-500/25"
+                    src={userData?.avatar}
+                    alt={"image"}
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-[10px] bg-white/[0.06] flex items-center justify-center">
+                    <User size={15} text-slate-400 />
+                  </div>
+                )}
+              </div>
 
       </div>
     );
@@ -189,7 +204,7 @@ const SideBar = () => {
             >
               {/* image work */}
               <div className="relative shrink-0">
-                {userData.avatar || !imageError ? (
+                {userData.avatar && !imageError ? (
                   <img
                     className="w-9 h-9 rounded-[10px] object-cover border-2 border-indigo-500/25"
                     src={userData?.avatar}

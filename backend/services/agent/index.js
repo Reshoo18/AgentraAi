@@ -1,11 +1,14 @@
 import express from "express"
 import dotenv from "dotenv"
+ dotenv.config({ path: "./.env" });
+
+
 import connectDb from "./config/db.js"
 import router from "./routes/agent.route.js"
 
 
 const app=express()
-dotenv.config()
+
 
 const PORT=process.env.PORT || 5003
 
