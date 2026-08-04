@@ -1,5 +1,5 @@
 import express from "express"
-import { agent } from "../controllers/chat.controller.js"
+import { agent } from "../controllers/agent.controller.js"
 
 const router=express.Router()
 

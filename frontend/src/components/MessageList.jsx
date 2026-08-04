@@ -40,12 +40,15 @@ const MessageList = () => {
         </div>
       ) : (
         <div>
-            {messages.map((msg,i)=>{
-                <div>
-                    <MessageBubble role={msg?.role} content={msg?.content}/>
-                </div>
-            })}
-        </div>
+  {messages.map((msg, i) => (
+    <div key={msg._id || i}>
+      <MessageBubble
+        role={msg.role}
+        content={msg.content}
+      />
+    </div>
+  ))}
+</div>
       )}
     </div>
   );
