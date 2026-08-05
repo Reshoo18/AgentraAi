@@ -10,6 +10,10 @@ export const getMemory=async(conversationId)=>{
     }
 
     const messages=await getMessages(conversationId)
+
+
+console.log("Messages from API =>", messages);
+
     await redis.set(key,JSON.stringify(messages),"EX",24*60*60)
 
     return messages
@@ -19,9 +23,10 @@ export const getMemory=async(conversationId)=>{
 
 export const addMessage=async(conversationId,role,content)=>{
      const key=`messages-${conversationId}`
-     const rawMessages=await redis.set(key)
+     const rawMessages=await redis.get(key)
 
      const messages=rawMessages?JSON.parse(rawMessages):[]
+
 
      messages.push({
         role,content
@@ -30,5 +35,5 @@ export const addMessage=async(conversationId,role,content)=>{
      if(messages.length>20){
         messages.shift()
      }
-     await redis.set(key,JSON.stringify(messages))
+     await redis.set(key,JSON.stringify(messages),"EX",24*60*60)
 }
