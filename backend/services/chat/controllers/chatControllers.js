@@ -67,11 +67,11 @@ export const getMessage = async (req, res) => {
     });
   }
 };
-export const updateConversation =async ()=>{
+export const updateConversation =async (req,res)=>{
     try {
-       const {id,title}=req.params
+       const {id,title}=req.body
 
-       const conversation= await Conversation.update(id,{title})
+       const conversation= await Conversation.findByIdAndUpdate(id,{title})
        return res.status(200).json(conversation)
     } catch (error) {
        return res.status(500).json({message:`update conversation ${error}`})

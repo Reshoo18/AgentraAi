@@ -11,7 +11,8 @@ export const getMemory=async(conversationId)=>{
 
     const messages=await getMessages(conversationId)
 
-
+console.log("cached =", cached);
+console.log("Messages from API =>", messages);
 console.log("Messages from API =>", messages);
 
     await redis.set(key,JSON.stringify(messages),"EX",24*60*60)

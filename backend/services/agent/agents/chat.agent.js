@@ -28,7 +28,7 @@ Formatting:
     const messages=[
         new SystemMessage(systemPrompt)
     ]
-
+console.log("conversationId =", state.conversationId);
 console.log("history =", history);
 console.log("isArray =", Array.isArray(history));
 console.log("type =", typeof history);

@@ -1,6 +1,16 @@
 import { getModel } from "../config/llmModel.js"
+import { agent } from "../controllers/agent.controller.js"
 
 export const router=async(state)=>{
+    
+    if(agent.state && agent.state!=="auto"){
+      return {
+    ...state,
+    agent:state.agent
+  
+}
+    }
+
     const llm=getModel("router")
     const prompt=`You are an agent router.
 
@@ -59,7 +69,7 @@ User Query:
  ${state.prompt}`
 
 const response=await llm.invoke(prompt)
-  console.log(response)
+
 return {
     ...state,
     agent:response.content
