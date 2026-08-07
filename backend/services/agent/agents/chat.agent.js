@@ -1,13 +1,37 @@
-import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages"
-import { getModel } from "../config/llmModel.js"
-import { getMemory } from "../config/memory.js"
+import {
+  AIMessage,
+  HumanMessage,
+  SystemMessage,
+} from "@langchain/core/messages";
+import { getModel } from "../config/llmModel.js";
+import { getMemory } from "../config/memory.js";
 
-export const chatAgent=async(state)=>{
-    const llm=getModel("chat")
-    
-    const history = await getMemory(state.conversationId)
+export const chatAgent = async (state) => {
+  const llm = getModel("chat");
 
-    const systemPrompt=`You are CortexAI, an intelligent AI assistant.
+  const history = await getMemory(state.conversationId);
+const searchContext = state.searchResults?.results?.length
+  ? state.searchResults.results
+      .slice(0, 3)
+      .map(
+        (item, index) => `
+Result ${index + 1}
+
+Title: ${item.title}
+
+Content:
+${item.content}
+`
+      )
+      .join("\n\n")
+  : "";
+
+  const systemPrompt = `You are CortexAI, an intelligent AI assistant.
+
+  ${searchContext}
+   If searchContext is exist
+-Use search results to answer.
+-Do not mention internal tools
 
     Rules:
 
@@ -24,33 +48,39 @@ Formatting:
 - Keep paragraphs short and readable.
 - Never write headings and content on the same line.
 - Never generate large walls of text.
-`
-    const messages=[
-        new SystemMessage(systemPrompt)
-    ]
-console.log("conversationId =", state.conversationId);
-console.log("history =", history);
-console.log("isArray =", Array.isArray(history));
-console.log("type =", typeof history);
+`;
+  const messages = [new SystemMessage(systemPrompt)];
+  console.log("conversationId =", state.conversationId);
+  console.log("history =", history);
+  console.log("isArray =", Array.isArray(history));
+  console.log("type =", typeof history);
 
+//   history.forEach((msg) => {
+//     if (msg.role == "user") {
+//       messages.push(new HumanMessage(msg.content));
+//     }
+//     if (msg.role == "assistant") {
+//       messages.push(new AIMessage(msg.content));
+//     }
+//   });
+  history.forEach((msg) => {
+  if (!msg.content) return;
 
-    history.forEach(msg=>{
-        if(msg.role=="user"){
-            messages.push(new HumanMessage(msg.content))
-        }if(msg.role=="assistant"){
-            messages.push(new AIMessage(msg.content))
-        }
-    }
-    
+  if (msg.role === "user") {
+    messages.push(new HumanMessage(msg.content));
+  }
 
-    )
-    messages.push(new HumanMessage(state.prompt))
-    console.log(messages)
+  if (msg.role === "assistant") {
+    messages.push(new AIMessage(msg.content));
+  }
+});
+  messages.push(new HumanMessage(state.prompt));
+  console.log(messages);
 
-    const response=await llm.invoke(messages)
+  const response = await llm.invoke(messages);
 
-    return {
-        ...state,
-        aiResponse:response.content
-    }
-}
+  return {
+    ...state,
+    aiResponse: response.content,
+  };
+};
