@@ -8,6 +8,15 @@ import remarkGfm from 'remark-gfm'
 const MessageBubble = ({role,content,images=[]}) => {
 const isUser = role === "user";
 const [lightBox,setLightBox]=useState(null)
+const [copyCode,setCopyCode]=useState("")
+
+const copyCode=async(code)=>{
+  await navigator.clipboard.writeText(code)
+  setCopyCode(code)
+  setTimeout(() => {
+    setCopyCode("")
+  }, 2000);
+}
 
 return (
   <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
