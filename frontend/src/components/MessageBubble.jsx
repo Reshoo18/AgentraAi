@@ -1,20 +1,22 @@
-import { ExternalLink, X } from 'lucide-react';
+import { Check, Copy, ExternalLink, X } from 'lucide-react';
 import React, { useState } from 'react'
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 
 
 const MessageBubble = ({role,content,images=[]}) => {
 const isUser = role === "user";
 const [lightBox,setLightBox]=useState(null)
-const [copyCode,setCopyCode]=useState("")
+const [copiedCode,setCopiedCode]=useState("")
 
-const copyCode=async(code)=>{
+const  copyCode=async(code)=>{
   await navigator.clipboard.writeText(code)
-  setCopyCode(code)
+  setCopiedCode(code)
   setTimeout(() => {
-    setCopyCode("")
+    setCopiedCode("")
   }, 2000);
 }
 
@@ -90,7 +92,7 @@ code: ({ className, children }) => {
 
   if (!className) {
     return (
-      <code className="bg-white/10 px-1.5 py-0.5 rounded text-pink-400">
+      <code className="bg-white/10 px-1.5 py-0.5 rounded text-indigo-200">
         {value}
       </code>
     );
@@ -100,7 +102,39 @@ code: ({ className, children }) => {
 
   return (
     <div className="my-4 overflow-hidden rounded-xl border border-white/10 bg-[#111318]">
-      {/* baaki code block yaha continue hoga */}
+        <div className='flex items-center justify-between bg-[#1b1d24] border-b border-white/10 px-4 py-2 '>
+            <span className='uppercase text-xs text-slate-100'>
+              {language}
+            </span>
+            <button className='flex items-center gap-1 text-xs ' onClick={()=>copyCode(value)} >
+              {
+                copiedCode==value?
+                <>
+                <Check/>
+                Copied
+                </>:<>
+                <Copy size={14}/>
+                </>
+              }
+            </button>
+        </div>
+      
+      <SyntaxHighlighter
+        language={language}
+        style={oneDark}
+         wrapLongLines
+         showLineNumbers
+         customStyle={{
+          margin:0,
+          padding:"16px",
+          background: "#0d1117",
+          fontSize:"13px"
+         }
+         }
+        >
+        {value}
+      </SyntaxHighlighter>
+
     </div>
   );
 },
@@ -129,6 +163,7 @@ a: ({ href, children }) => (
     <ExternalLink size={14} />
   </a>
 ),
+
   }}
 >
   {content}

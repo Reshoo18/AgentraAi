@@ -1,38 +1,4 @@
-// import { ChatGroq } from "@langchain/groq"
-// import { ChatGoogleGenerativeAI} from "@langchain/google-genai"
 
-// const groq = new ChatGroq({
-  
-//     model: "openai/gpt-oss-120b",
-  
-    
-// })
-
-// const google=new ChatGoogleGenerativeAI({
-  
-//      model: "openai/gpt-oss-120b",
-// })
-
-
-
-
-
-// export const getModel=async(agent)=>{
-//     switch (agent) {
-//         case "chat":
-            
-//             return groq
-    
-//         case "search":
-//             return groq
-        
-//         case "coding":
-//             return google
-        
-//         default :
-//           return groq
-//     }
-// }
 
 import dotenv from "dotenv";
 
@@ -42,6 +8,7 @@ import dotenv from "dotenv";
 
 import { ChatGroq } from "@langchain/groq";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import {ChatOpenRouter } from '@langchain/openrouter'
 
 
 const groq = new ChatGroq({
@@ -54,6 +21,12 @@ const google = new ChatGoogleGenerativeAI({
   model: "gemini-2.5-flash",
 });
 
+const openrouter=new ChatOpenRouter({
+    model:"deepseek/deepseek-chat",
+    temperature:0,
+    maxTokens:2500
+})
+
 export const getModel = (agent) => {
   switch (agent) {
     case "chat":
@@ -61,7 +34,7 @@ export const getModel = (agent) => {
       return groq;
 
     case "coding":
-      return google;
+      return openrouter;
 
     default:
       return groq;
