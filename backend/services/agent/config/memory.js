@@ -1,40 +1,52 @@
-import redis from '../../../shared/redis/redis.js'
-import { getMessages } from '../utils.js/getMessages.js'
+import redis from "../../../shared/redis/redis.js";
+import { getMessages } from "../utils.js/getMessages.js";
 
-export const getMemory=async(conversationId)=>{
-    const key=`messages-${conversationId}`
-    const cached=await redis.get(key)
+export const getMemory = async (conversationId) => {
+  const key = `messages-${conversationId}`;
 
-    if(cached){
-        return JSON.parse(cached)
-    }
+  const cached = await redis.get(key);
 
-    const messages=await getMessages(conversationId)
+  if (cached) {
+    return JSON.parse(cached);
+  }
 
-console.log("cached =", cached);
-console.log("Messages from API =>", messages);
-console.log("Messages from API =>", messages);
+  const messages = await getMessages(conversationId);
 
-    await redis.set(key,JSON.stringify(messages),"EX",24*60*60)
+  console.log("cached =", cached);
+  console.log("Messages from API =>", messages);
 
-    return messages
+  await redis.set(
+    key,
+    JSON.stringify(messages),
+    "EX",
+    24 * 60 * 60
+  );
 
-    
-}
+  return messages;
+};
 
-export const addMessage=async(conversationId,role,content)=>{
-     const key=`messages-${conversationId}`
-     const rawMessages=await redis.get(key)
+export const addMessage = async (conversationId, role, content) => {
+  const key = `messages-${conversationId}`;
 
-     const messages=rawMessages?JSON.parse(rawMessages):[]
+  const rawMessages = await redis.get(key);
 
+  const messages = rawMessages
+    ? JSON.parse(rawMessages)
+    : [];
 
-     messages.push({
-        role,content
-     })
+  messages.push({
+    role,
+    content,
+  });
 
-     if(messages.length>20){
-        messages.shift()
-     }
-     await redis.set(key,JSON.stringify(messages),"EX",24*60*60)
-}
+  if (messages.length > 20) {
+    messages.shift();
+  }
+
+  await redis.set(
+    key,
+    JSON.stringify(messages),
+    "EX",
+    24 * 60 * 60
+  );
+};

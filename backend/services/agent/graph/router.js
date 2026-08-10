@@ -1,9 +1,9 @@
 import { getModel } from "../config/llmModel.js"
-import { agent } from "../controllers/agent.controller.js"
+
 
 export const router=async(state)=>{
     
-    if(agent.state && agent.state!=="auto"){
+    if(state.agent && state.agent!=="auto"){
       return {
     ...state,
     agent:state.agent
@@ -63,6 +63,7 @@ chat
 search
 coding
 pdf
+ppt
 vision
 
 User Query: 

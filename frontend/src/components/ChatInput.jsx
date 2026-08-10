@@ -13,7 +13,7 @@ import {
 import React from "react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addMessages, setMessages } from "../redux/messageSlice";
+import { addMessages, setArtifacts, setMessages } from "../redux/messageSlice.js";
 import sendMsg from "../features/sendMessage.js";
 import { createConversation } from "../features/createConversation.js";
 import {
@@ -34,40 +34,66 @@ const ChatInput = () => {
   const dispatch = useDispatch();
 
   const handleSendMessage = async () => {
-    let conversation = selectedConversation;
+  if (!value.trim()) return;
 
-    if (!conversation) {
-      const conv = await createConversation();
-      dispatch(setSelectedConversation(conv));
-      dispatch(addConversation(conv));
-      conversation = conv;
-    }
-    if (conversation.title == "New chat") {
-      const conv = await updateCoversation({
-        id: conversation?._id,
-        title: value.trim(),
-      });
-      dispatch(
-        setConvTitle({
-          conversationId: conversation._id,
-          title: value.slice(0, 40),
-        }),
-      );
-    }
+  let conversation = selectedConversation;
 
-    const payload = {
-      prompt: value.trim(),
-      conversationId: conversation?._id,agent:selectedAgent.toLowerCase()
-    };
+  if (!conversation) {
+    const conv = await createConversation();
 
-    dispatch(addMessages({ role: "user", content: value.trim() }));
-    setValue("");
+    dispatch(setSelectedConversation(conv));
+    dispatch(addConversation(conv));
 
-    const data = await sendMsg(payload);
-    dispatch(addMessages({ role: "assistant", content: data?.answer,images:data?.images}));
-    console.log(data);
+    conversation = conv;
+  }
+
+  if (conversation.title === "New chat") {
+    await updateCoversation({
+      id: conversation?._id,
+      title: value.trim(),
+    });
+
+    dispatch(
+      setConvTitle({
+        conversationId: conversation._id,
+        title: value.slice(0, 40),
+      })
+    );
+  }
+
+  const payload = {
+    prompt: value.trim(),
+    conversationId: conversation?._id,
+    agent: selectedAgent.toLowerCase(),
   };
 
+  dispatch(
+    addMessages({
+      role: "user",
+      content: value.trim(),
+    })
+  );
+
+  setValue("");
+
+  const data = await sendMsg(payload);
+
+  console.log("API DATA:", data);
+  console.log("ARTIFACTS:", data?.artifacts);
+
+  // Redux artifact state
+  dispatch(setArtifacts(data?.artifacts || []));
+
+  // Add assistant message
+  dispatch(
+    addMessages({
+      role: "assistant",
+      content: data?.answer || "",
+      images: data?.images || [],
+      artifacts: data?.artifacts || [],
+    })
+  );
+};
   const agents = [
     {
       id: "auto",
@@ -115,6 +141,7 @@ const ChatInput = () => {
             const Icon = agent.icon;
             return (
               <div
+                key={agent.id}
               onClick={()=>setSelectedAgent(agent.label)}
                 className={`
     flex-shrink-0

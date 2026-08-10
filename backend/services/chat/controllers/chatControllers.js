@@ -40,12 +40,18 @@ export const getConversations =async (req,res)=>{
 
 export const saveMessage=async (req,res)=>{
    try {
-     const {conversationId,role,content,images}=req.body
+     const {conversationId,role,content,images,artifacts}=req.body
+     
+         console.log("SAVE MESSAGE:");
+    console.log("role:", role);
+    console.log("artifacts:", artifacts);
+
     const message= await Message.create({
         conversationId,
         role,
         content,
-        images
+        images: images || [],
+      artifacts: artifacts || [],
     }
     )
     return res.status(200).json(message)

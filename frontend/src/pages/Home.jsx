@@ -45,9 +45,13 @@ const Home = () => {
   return (
     <div className="h-screen flex bg-black text-white overflow-hidden">
         
-        <SideBar/>
-        <ChatArea/>
-        <Artifact/>
+     <SideBar />
+
+    <main className="flex-1 min-w-0 h-full">
+      <ChatArea />
+    </main>
+
+    <Artifact />
       {!userData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="w-[340px] bg-[#13151c] border border-white/[0.08] rounded-2xl p-7 flex flex-col gap-5">
