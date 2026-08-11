@@ -189,7 +189,22 @@ Rules:
 - Beautiful spacing
 - Single page unless user asks otherwise.
 
-Return ONLY valid JSON.
+
+IMAGES
+=============================
+
+Always use real Unsplash images.
+
+Never use:
+- via.placeholder.com
+- placehold.co
+- placeholder.com
+- dummyimage.com
+- any placeholder image URL
+
+If an image is needed, use a real Unsplash URL.
+
+Never generate placeholder URLs.
 
 Schema:
 {

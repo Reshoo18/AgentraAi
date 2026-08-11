@@ -102,7 +102,7 @@ const SideBar = () => {
                   />
                 ) : (
                   <div className="w-9 h-9 rounded-[10px] bg-white/[0.06] flex items-center justify-center">
-                    <User size={15} text-slate-400 />
+                    <User size={15} className="text-slate-400 "/>
                   </div>
                 )}
               </div>
@@ -214,7 +214,7 @@ const SideBar = () => {
                   />
                 ) : (
                   <div className="w-9 h-9 rounded-[10px] bg-white/[0.06] flex items-center justify-center">
-                    <User size={15} text-slate-400 />
+                    <User size={15} className="text-slate-400" />
                   </div>
                 )}
               </div>
