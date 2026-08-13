@@ -1,30 +1,136 @@
-import { getModel } from "../config/llmModel"
+import axios from "axios";
+import { getModel } from "../config/llmModel.js";
+import { uploadToS3 } from "../utils.js/uploadToS3.js";
+import { getFromS3 } from "../utils.js/getFromS3.js";
 
-export const visionAgent=async(state)=>{
-    const llm=await getModel("image")
-   const res = await llm.invoke(`
-You are an elite AI image prompt engineer.
+export const visionAgent = async (state) => {
+  try {
+    // 1. Convert user's request into a detailed image prompt
+    const llm = await getModel("image");
 
-Convert the user request into a highly detailed image generation prompt.
+    const res = await llm.invoke(`
+You are an expert image generation prompt engineer.
 
-Requirements:
+Convert the user's request into ONE precise image-generation prompt.
 
-- Cinematic lighting
-- Professional composition
-- Ultra realistic
-- High detail
-- Beautiful color palette
-- Sharp focus
-- 8K quality
-- Photorealistic
-- Depth of field
-- Professional photography
-- Stunning visuals
+STRICT RULES:
+- Preserve every subject explicitly requested by the user.
+- Never remove, replace, or substitute a requested subject.
+- "and" means ALL requested subjects must appear.
+- Preserve the exact number of important subjects when specified.
+- Keep all requested objects, animals, people and vehicles clearly visible.
+- Do not add unrelated main subjects.
+- Make the scene physically realistic and coherent.
 
-Return only the image prompt.
+Style:
+- photorealistic
+- cinematic lighting
+- professional photography
+- realistic textures
+- sharp focus
+- natural colors
+- beautiful composition
+- depth of field
+- high detail
+
+Return ONLY the final image prompt.
 
 User Request:
 ${state.prompt}
 `);
-const prompt=res.content.trim()
-}
+
+    const prompt = res.content.trim();
+
+    console.log("FINAL IMAGE PROMPT:");
+    console.log(prompt);
+
+    // 2. Cloudflare Workers AI
+    const url =
+      `https://api.cloudflare.com/client/v4/accounts/` +
+      `${process.env.CLOUDFLARE_ACCOUNT_ID}` +
+      `/ai/run/@cf/black-forest-labs/flux-1-schnell`;
+
+    console.log("CLOUDFLARE IMAGE REQUEST");
+
+    const imageRes = await axios.post(
+      url,
+      {
+        prompt: prompt,
+        steps: 4,
+        seed: Math.floor(Math.random() * 2147483647)
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    console.log("CLOUDFLARE RESPONSE RECEIVED");
+
+    // 3. Cloudflare returns Base64 image
+    const base64Image = imageRes.data?.result?.image;
+
+    if (!base64Image) {
+      throw new Error(
+        `Cloudflare did not return an image: ${JSON.stringify(imageRes.data)}`
+      );
+    }
+
+    // 4. Base64 -> Buffer
+    const buffer = Buffer.from(base64Image, "base64");
+
+    // 5. Upload to S3
+    const filename = `image-${Date.now()}.jpg`;
+
+    await uploadToS3(
+      filename,
+      buffer,
+      "image/jpeg"
+    );
+
+    // 6. Generate signed S3 URL
+    const downloadUrl = await getFromS3(
+      filename,
+      24 * 60 * 60
+    );
+
+    // 7. Return result
+    return {
+      ...state,
+
+      aiResponse: `
+# 🖼️ Image Generated Successfully
+
+![Generated Image](${downloadUrl})
+
+📥 [Download Image](${downloadUrl})
+
+⏳ Link expires in 24 hours.
+`,
+
+      images: [downloadUrl]
+    };
+
+  } catch (error) {
+
+    console.error("IMAGE GENERATION ERROR:", error.message);
+
+    console.error(
+      "STATUS:",
+      error?.response?.status
+    );
+
+    console.error(
+      "DATA:",
+      error?.response?.data
+    );
+
+    return {
+      ...state,
+      aiResponse: "❌ Failed to generate image",
+      images: []
+    };
+  }
+};

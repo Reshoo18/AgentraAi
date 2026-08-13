@@ -121,9 +121,9 @@ const ChatInput = () => {
       label: "PPT",
     },
     {
-      id: "image",
+      id: "vision",
       icon: Image,
-      label: "Image",
+      label: "Vision",
     },
     {
       id: "search",
