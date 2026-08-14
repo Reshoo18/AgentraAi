@@ -93,7 +93,7 @@ ${state.prompt}
     // 6. Generate signed S3 URL
     const downloadUrl = await getFromS3(
       filename,
-      24 * 60 * 60
+      24 * 60 
     );
 
     // 7. Return result
