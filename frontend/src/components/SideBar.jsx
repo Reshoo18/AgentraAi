@@ -21,6 +21,7 @@ import {
 import { createConversation } from "../features/createConversation";
 import logOut from "../features/logOut";
 import { setUserData } from "../redux/userSlice";
+import BillingDrawer from "./BillingDrawer";
 
 const SideBar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -29,6 +30,8 @@ const SideBar = () => {
   const { conversations, selectedConversation } = useSelector(
     (state) => state.conversation,
   );
+
+  const [showBilling,setShowBilling]=useState(false)
   const { userData } = useSelector((state) => state.user);
   useEffect(() => {
     const getConv = async () => {
@@ -230,6 +233,7 @@ const SideBar = () => {
 
               <div className="flex gap-1">
                 <button
+                onClick={()=>setShowBilling(true)}
                   className="flex items-center justify-center w-7 h-7 rounded-[7px] border-none bg-transparent
                          text-yellow-600 cursor-pointer hover:bg-white/[0.08]
                           hover:text-slate-400 transition-all duration-150"
@@ -260,6 +264,11 @@ const SideBar = () => {
           )}
         </div>
       </div>
+
+      <BillingDrawer 
+      open={showBilling}
+      onClose={()=>setShowBilling(false)}
+      />
     </div>
   );
 };
