@@ -1,9 +1,9 @@
 import express from "express"
 import { createOrder, verifyPayment } from "../controllers/billing.controller.js"
 
-const rounter=express.Router()
+const router=express.Router()
 
-rounter.post("/create",createOrder)
-rounter.post("/verify",verifyPayment)
+router.post("/create",createOrder)
+router.post("/verify",verifyPayment)
 
-export default rounter
+export default router

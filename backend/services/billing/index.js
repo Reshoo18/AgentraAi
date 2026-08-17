@@ -1,14 +1,14 @@
 import express from "express"
 import connectDb from "./config/db.js" 
 import dotenv from "dotenv"
-import rounter from "./routes/billing.route.js"
+import router from "./routes/billing.route.js"
 const app=express()
 dotenv.config()
 
 
 const PORT= process.env.PORT || 5004
-
-app.use('/',rounter)
+app.use(express.json());
+app.use('/',router)
 
 app.get("/",(req,res)=>{
     res.send("hello i am billing server")
