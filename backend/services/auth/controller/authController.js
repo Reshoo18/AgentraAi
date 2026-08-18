@@ -179,3 +179,81 @@ export const updateUserPayment = async (req, res) => {
     });
   }
 };
+
+export const deductCredits = async (req, res) => {
+  try {
+    const { userId, agent } = req.body;
+
+    const COST = {
+      chat: 1,
+      search: 5,
+      coding: 10,
+      pdf: 10,
+      ppt: 10,
+      vision: 10,
+    };
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(400).json({
+        message: "user not found",
+      });
+    }
+
+    const requiredCredits = COST[agent] || 1;
+
+    if (user.credits < requiredCredits) {
+      return res.status(400).json({
+        message: "Not enough credits.",
+      });
+    }
+
+    // Deduct credits
+    user.credits -= requiredCredits;
+
+    await user.save();
+
+    console.log("CREDITS DEDUCTED:", requiredCredits);
+    console.log("REMAINING CREDITS:", user.credits);
+
+    // Get current session
+    const sessionId = await redis.get(
+      `user-session-${user._id}`
+    );
+
+    console.log("SESSION ID:", sessionId);
+
+    // Update Redis session
+    if (sessionId) {
+      await redis.set(
+        `session:${sessionId}`,
+        JSON.stringify({
+          userID: user._id,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar,
+          plan: user.plan,
+          credits: user.credits,
+          totalCredits: user.totalCredits,
+          planExpiresAt: user.planExpiresAt,
+        }),
+        "EX",
+        7 * 24 * 60 * 60
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      credits: user.credits,
+      deducted: requiredCredits,
+    });
+
+  } catch (error) {
+    console.error("DEDUCT CREDITS ERROR:", error);
+
+    return res.status(500).json({
+      message: `Deduct credits error: ${error.message}`,
+    });
+  }
+}; 

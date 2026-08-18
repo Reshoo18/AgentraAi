@@ -138,6 +138,7 @@
 // }
 
 import { getModel } from "../config/llmModel.js";
+import { deductCredits } from "../utils.js/deductInterviews.js";
 
 export const codingAgent = async (state) => {
   const intentLlm = getModel("intent");
@@ -252,6 +253,7 @@ ${state.prompt}
 
     try {
       data = JSON.parse(content);
+      await deductCredits(state.userId,"coding")
     } catch (error) {
       console.error("CODING JSON ERROR:", error);
       console.error("MODEL RESPONSE:", content);
@@ -309,6 +311,7 @@ User Request:
 
 ${state.prompt}
 `);
+await deductCredits(state.userId,"coding")
 
   return {
     ...state,

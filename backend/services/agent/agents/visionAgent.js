@@ -2,6 +2,7 @@ import axios from "axios";
 import { getModel } from "../config/llmModel.js";
 import { uploadToS3 } from "../utils.js/uploadToS3.js";
 import { getFromS3 } from "../utils.js/getFromS3.js";
+import { deductCredits } from "../utils.js/deductInterviews.js";
 
 export const visionAgent = async (state) => {
   try {
@@ -66,7 +67,7 @@ ${state.prompt}
         }
       }
     );
-
+     await deductCredits(state.userId,"vision")
     console.log("CLOUDFLARE RESPONSE RECEIVED");
 
     // 3. Cloudflare returns Base64 image
