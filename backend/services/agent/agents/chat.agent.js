@@ -81,7 +81,7 @@ Formatting:
   console.log(messages);
 
   const response = await llm.invoke(messages);
-  await deductCredits(state.userId,"chat")
+   await deductCredits(state.userId,"chat")
 
   return {
     ...state,

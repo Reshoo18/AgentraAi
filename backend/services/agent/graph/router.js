@@ -11,6 +11,19 @@ export const router=async(state)=>{
 }
     }
 
+    if(state.file.mimeType==="application/pdf"){
+        return {
+            ...state,
+            agent:"pdfRag"
+        }
+    }
+    if(state.file.mimeType.startsWith==="image/"){
+        return{
+          ...state,
+          agent:"imageAnalyzer"
+        }
+    }
+
     const llm=getModel("router")
     const prompt=`You are an agent router.
 
