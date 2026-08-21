@@ -1,12 +1,14 @@
 import {
   Coins,
   LogOut,
+  Menu,
   MessageSquare,
   PanelLeftIcon,
   PanelRight,
   PenSquare,
   Plus,
   User,
+  X,
 } from "lucide-react";
 import React from "react";
 import { useEffect } from "react";
@@ -32,6 +34,7 @@ const SideBar = () => {
   );
 
   const [showBilling,setShowBilling]=useState(false)
+  const [mobileOpen,setMobileOpen]=useState(false)
   const { userData } = useSelector((state) => state.user);
   useEffect(() => {
     const getConv = async () => {
@@ -50,6 +53,7 @@ const SideBar = () => {
   if (collapsed) {
     return (
       <div className="hidden lg:flex flex-col items-center w-[56px] h-screen bg-[#0d0f14] border-r border-white/[0.06] py-4 gap-1 shrink-0">
+
         <button
           className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer mb-1"
           onClick={() => setCollapsed(false)}
@@ -115,10 +119,34 @@ const SideBar = () => {
   }
 
   return (
+    <>
+    
+         <button
+  className="lg:hidden fixed top-3.5 left-4 z-50 flex items-center justify-center w-8 h-8 rounded-lg bg-[#0d0f14] border border-white/[0.06] text-slate-400 hover:text-slate-200 transition-colors duration-150 cursor-pointer"
+  onClick={() => setMobileOpen(true)}
+>
+  <Menu size={14} />
+</button>
+
+{mobileOpen && (
+  <div
+    onClick={() => setMobileOpen(false)}
+    className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+  />
+)}
+
     <div
-      className="fixed lg:static inset-y-0 left-0 z-50 w-[270px] 
-    h-screen shrink-0 bg-[#0d0f14] border-r border-white/[0.06]"
-    >
+  className={`
+    fixed lg:static inset-y-0 left-0 z-50
+    w-[270px] h-screen shrink-0
+    bg-[#0d0f14] border-r border-white/[0.06]
+    transition-transform duration-250
+    ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+  `}
+>
+
+      
+   
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2.5 px-4 py-4 border-b border-white/[0.06]">
           <div
@@ -128,6 +156,12 @@ const SideBar = () => {
           >
             <PanelLeftIcon />
           </div>
+          <button
+  onClick={() => setMobileOpen(false)}
+  className="lg:hidden flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer"
+>
+  <X />
+</button>
           <span className="text-[16px] font-semibold text-slate-100 tracking-tight flex-1">
             AgetraAi
           </span>
@@ -265,11 +299,13 @@ const SideBar = () => {
         </div>
       </div>
 
+    
+    </div>
       <BillingDrawer 
       open={showBilling}
       onClose={()=>setShowBilling(false)}
       />
-    </div>
+    </>
   );
 };
 
