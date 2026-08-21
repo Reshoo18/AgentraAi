@@ -1,31 +1,35 @@
-import { getModel } from "../config/llmModel.js"
+import { getModel } from "../config/llmModel.js";
 
+export const router = async (state) => {
 
-export const router=async(state)=>{
-    
-    if(state.agent && state.agent!=="auto"){
+  if (state.agent && state.agent !== "auto") {
+    return {
+      ...state,
+      agent: state.agent,
+    };
+  }
+
+  // Check file only if file exists
+  if (state.file) {
+
+    if (state.file.mimetype === "application/pdf") {
       return {
-    ...state,
-    agent:state.agent
-  
-}
+        ...state,
+        agent: "pdfRag",
+      };
     }
 
-    if(state.file.mimeType==="application/pdf"){
-        return {
-            ...state,
-            agent:"pdfRag"
-        }
+    if (state.file.mimetype.startsWith("image/")) {
+      return {
+        ...state,
+        agent: "imageAnalyzer",
+      };
     }
-    if(state.file.mimeType.startsWith==="image/"){
-        return{
-          ...state,
-          agent:"imageAnalyzer"
-        }
-    }
+  }
 
-    const llm=getModel("router")
-    const prompt=`You are an agent router.
+  const llm = getModel("router");
+
+  const prompt = `You are an agent router.
 
 Available agents:
 
@@ -79,16 +83,15 @@ pdf
 ppt
 vision
 
-User Query: 
- ${state.prompt}`
+User Query:
+${state.prompt}`;
 
-const response=await llm.invoke(prompt)
+  const response = await llm.invoke(prompt);
 
-return {
+  return {
     ...state,
-    agent:response.content
-    .trim()
-    .toLowerCase()
-}
-
-}
+    agent: response.content
+      .trim()
+      .toLowerCase(),
+  };
+};

@@ -1,6 +1,7 @@
-import { SystemMessage } from "@langchain/core/messages"
+import { SystemMessage ,HumanMessage} from "@langchain/core/messages"
 import { getModel } from "../config/llmModel.js"
-import fs from "fs"
+import fs from "fs/promises"
+import { deductCredits } from "../utils.js/deductInterviews.js"
 
 export const imageAnalyzer=async (state)=>{
     try {
@@ -44,6 +45,7 @@ new HumanMessage(
         ]
 
         const response = await llm.invoke(messages)
+        await deductCredits(state.userId,"vision")
         return{
             ...state,
             aiResponse:response.content
@@ -51,10 +53,10 @@ new HumanMessage(
     } catch (error) {
         return{
             ...state,
-            aiResponse:"failed to analyze the image"
+            aiResponse:`failed to analyze the image ${error.message}`
         }
     }
     finally{
-        fs.unlink(state.file.path)
+       await  fs.unlink(state.file.path)
     }
 }

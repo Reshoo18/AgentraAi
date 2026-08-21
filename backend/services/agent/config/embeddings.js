@@ -4,5 +4,5 @@ dotenv.config()
 
 export const embeddings = new GoogleGenerativeAIEmbeddings({
   model: "gemini-embedding-001", // 768 dimensions
-
+  apiKey:process.env.GEMINI_API_KEY
 });
