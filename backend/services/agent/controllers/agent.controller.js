@@ -2,7 +2,7 @@ import axios from "axios";
 import { graph } from "../graph/graphs.js";
 import { addMessage } from "../config/memory.js";
 
-export const agent = async (req, res) => {
+export const agent = async (req, res,next) => {
   try {
     const { prompt, conversationId, agent } = req.body;
     const file=req.file
@@ -55,11 +55,6 @@ export const agent = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("AGENT ERROR:", error);
-
-    return res.status(500).json({
-      message: error.message,
-      stack: error.stack,
-    });
+    next(error)
   }
 };

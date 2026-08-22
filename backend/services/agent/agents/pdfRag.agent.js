@@ -6,8 +6,10 @@ import { getModel } from "../config/llmModel.js"
 import { HumanMessage, SystemMessage } from "@langchain/core/messages"
 import { deductCredits } from "../utils.js/deductInterviews.js"
 import vectorStore from "../config/vectorDb.js"
+import { checkAgentLimit } from "../config/agentLimit.js"
 export const pdfRag=async(state)=>{
     try {
+        await checkAgentLimit(state.userId,"pdf")
         const buffer=fs.readFileSync(state.file.path)
         const pdf=new PDFParse({
             data:buffer
@@ -81,13 +83,11 @@ new HumanMessage(`Context:${context}
             aiResponse:response.content
         }
     } catch (error) {
-
         console.log(error)
         return {
             ...state,
-            aiResponse:"failed to analyze pdf"
+            aiResponse: error?.data?.message ||"failed to analyze the pdf"
         }
-        
     }
     finally{
         fs.unlinkSync(state.file.path)

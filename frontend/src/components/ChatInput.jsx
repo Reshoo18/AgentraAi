@@ -14,7 +14,7 @@ import {
 import React from "react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addMessages, setArtifacts, setMessages } from "../redux/messageSlice.js";
+import { addMessages, setArtifacts, setLoading, setMessages } from "../redux/messageSlice.js";
 import sendMsg from "../features/sendMessage.js";
 import { createConversation } from "../features/createConversation.js";
 import {
@@ -30,7 +30,7 @@ const ChatInput = () => {
   const [value, setValue] = useState("");
   const [selectedAgent, setSelectedAgent] = useState("Auto");
   
-  const { messages } = useSelector((state) => state.message);
+  const { messages,isLoading } = useSelector((state) => state.message);
   const [selectedFile,setSelectedFile]=useState(null)
   const fileRef=useRef(null)
   const { selectedConversation } = useSelector((state) => state.conversation);
@@ -38,72 +38,80 @@ const ChatInput = () => {
 
   const dispatch = useDispatch();
 
-  const handleSendMessage = async () => {
+const handleSendMessage = async () => {
   if (!value.trim()) return;
 
-  let conversation = selectedConversation;
+  dispatch(setLoading(true));
 
-  if (!conversation) {
-    const conv = await createConversation();
+  try {
+    let conversation = selectedConversation;
 
-    dispatch(setSelectedConversation(conv));
-    dispatch(addConversation(conv));
+    if (!conversation) {
+      const conv = await createConversation();
 
-    conversation = conv;
-  }
+      dispatch(setSelectedConversation(conv));
+      dispatch(addConversation(conv));
 
-  if (conversation.title === "New chat") {
-    await updateCoversation({
-      id: conversation?._id,
-      title: value.trim(),
-    });
+      conversation = conv;
+    }
+
+    if (conversation.title === "New chat") {
+      await updateCoversation({
+        id: conversation?._id,
+        title: value.trim(),
+      });
+
+      dispatch(
+        setConvTitle({
+          conversationId: conversation._id,
+          title: value.slice(0, 40),
+        })
+      );
+    }
+
+    const formData = new FormData();
+
+    formData.append("prompt", value.trim());
+    formData.append("conversationId", conversation?._id);
+    formData.append("agent", selectedAgent.toLowerCase());
+
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
 
     dispatch(
-      setConvTitle({
-        conversationId: conversation._id,
-        title: value.slice(0, 40),
+      addMessages({
+        role: "user",
+        content: value.trim(),
       })
     );
+
+    setValue("");
+    setSelectedFile(null);
+
+    const data = await sendMsg(formData);
+
+    console.log("API DATA:", data);
+    console.log("ARTIFACTS:", data?.artifacts);
+
+    dispatch(setArtifacts(data?.artifacts || []));
+
+    dispatch(
+      addMessages({
+        role: "assistant",
+        content: data?.answer || "",
+        images: data?.images || [],
+        artifacts: data?.artifacts || [],
+      })
+    );
+  } catch (error) {
+    console.error("SEND MESSAGE ERROR:", error);
+  } finally {
+    dispatch(setLoading(false));
   }
-
-  const payload = {
-    prompt: value.trim(),
-    conversationId: conversation?._id,
-    agent: selectedAgent.toLowerCase(),
-  };
-  const formData = new FormData();
-  setSelectedFile(null)
-formData.append("prompt", value.trim());
-formData.append("conversationId", conversation?._id);
-formData.append("agent", selectedAgent.toLowerCase());
-formData.append("file", selectedFile);
-  dispatch(
-    addMessages({
-      role: "user",
-      content: value.trim(),
-    })
-  );
-
-  setValue("");
-
-  const data = await sendMsg(formData);
-
-  console.log("API DATA:", data);
-  console.log("ARTIFACTS:", data?.artifacts);
-
-  // Redux artifact state
-  dispatch(setArtifacts(data?.artifacts || []));
-
-  // Add assistant message
-  dispatch(
-    addMessages({
-      role: "assistant",
-      content: data?.answer || "",
-      images: data?.images || [],
-      artifacts: data?.artifacts || [],
-    })
-  );
 };
+
+
   const agents = [
     {
       id: "auto",
@@ -267,7 +275,7 @@ formData.append("file", selectedFile);
             </button>
           </div>
           <button
-            disabled={!value}
+            disabled={!value && isLoading}
             onClick={handleSendMessage}
             className={`flex items-center justify-center w-8 h-8 rounded-lg border-none cursor-pointer transition-all duration-150 ${
               value.trim()

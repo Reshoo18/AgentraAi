@@ -3,9 +3,11 @@ import { getModel } from "../config/llmModel.js";
 import { uploadToS3 } from "../utils.js/uploadToS3.js";
 import { getFromS3 } from "../utils.js/getFromS3.js";
 import { deductCredits } from "../utils.js/deductInterviews.js";
+import { checkAgentLimit } from "../config/agentLimit.js";
 
 export const visionAgent = async (state) => {
   try {
+    await checkAgentLimit(state.userId,"image")
     // 1. Convert user's request into a detailed image prompt
     const llm = await getModel("image");
 
@@ -115,23 +117,10 @@ ${state.prompt}
     };
 
   } catch (error) {
-
-    console.error("IMAGE GENERATION ERROR:", error.message);
-
-    console.error(
-      "STATUS:",
-      error?.response?.status
-    );
-
-    console.error(
-      "DATA:",
-      error?.response?.data
-    );
-
-    return {
-      ...state,
-      aiResponse: "❌ Failed to generate image",
-      images: []
-    };
-  }
+        console.log(error)
+        return {
+            ...state,
+            aiResponse: error?.data?.message ||"failed to generate the image"
+        }
+    }
 };
