@@ -31,10 +31,15 @@ const conversationSlice = createSlice({
     if(state.selectedConversation?._id==conversationId){
       state.selectedConversation={...state.selectedConversation,title}
     }  
-}
+},
+  removeConversation: (state, action) => {
+  state.conversations = state.conversations.filter(
+    (conv) => conv._id !== action.payload
+  );
+},
   },
 });
 
-export const {setConversations,addConversation,setSelectedConversation,setConvTitle} = conversationSlice.actions;
+export const {setConversations,addConversation,setSelectedConversation,setConvTitle,removeConversation} = conversationSlice.actions;
 
 export default conversationSlice.reducer;

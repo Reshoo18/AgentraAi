@@ -15,11 +15,11 @@ export const PLANS={
         credits:500,
         validity:30
     },
-     pro:{
+     pro :{
         id:"pro",
         name:"Pro",
         amount:499,
-        credits:100,
+        credits:1000,
         validity:30
     }
 }

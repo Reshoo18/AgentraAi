@@ -47,14 +47,13 @@ const handleSendMessage = async () => {
     let conversation = selectedConversation;
 
     if (!conversation) {
-      const conv = await createConversation();
+  const conv = await createConversation();
 
-      dispatch(setSelectedConversation(conv));
-      dispatch(addConversation(conv));
+  dispatch(setSelectedConversation(conv));
+  dispatch(addConversation(conv));
 
-      conversation = conv;
-    }
-
+  conversation = conv;
+}
     if (conversation.title === "New chat") {
       await updateCoversation({
         id: conversation?._id,
@@ -243,14 +242,25 @@ const handleSendMessage = async () => {
         
 
         <textarea
-          onChange={(e) => setValue(e.target.value)}
-          value={value}
-          placeholder="ask anything"
-          className="w-full bg-transparent outline-none resize-none text-[14px] text-slate-200
-   placeholder:text-slate-600 leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+  value={value}
+  onChange={(e) => setValue(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+
+      if (!isLoading && value.trim()) {
+        handleSendMessage();
+      }
+    }
+  }}
+  placeholder="Ask anything..."
+  className="w-full bg-transparent outline-none resize-none text-[14px] text-slate-200
+    placeholder:text-slate-600 leading-relaxed
+    [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
     disabled:opacity-50"
-          rows={3}
-        />
+  rows={3}
+  disabled={isLoading}
+/>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">

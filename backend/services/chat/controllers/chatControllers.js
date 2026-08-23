@@ -87,4 +87,29 @@ export const updateConversation =async (req,res)=>{
 
 
 
+export const deleteConversation=async(req,res)=>{
+   try {
+     const userID=req.headers["x-user-id"]
+     const { conversationId } = req.params;
 
+     const conversation=await Conversation.findOne({
+      _id:conversationId,
+      userID:userID
+     })
+     if(!conversation){
+      return res.status(404).json({message:"there is no conversation found"})
+     }
+
+    await Message.deleteMany({
+      conversationId:conversationId
+    })
+
+    await Conversation.deleteOne(
+     { _id:conversationId}
+    )
+    return res.status(200).json({message:"conversation delete successfully"})
+      
+   } catch (error) {
+       return res.status(500).json({message:`delete conversation ${error}`})
+    }
+}

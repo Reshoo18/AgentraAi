@@ -19,14 +19,19 @@ function BillingDrawer({ open, onClose }) {
         description: `${data?.plan?.name} Plan`,
         order_id: data?.order?.id,
 
-        handler: async (response) => {
-         try {
-             const data = await verifyPayment(response);
-          console.log(data)
-         } catch (error) {
-            console.log(error)
-         }
-        },
+     handler: async (response) => {
+  try {
+    const data = await verifyPayment(response);
+
+    console.log("Payment verification response:", data);
+
+    if (data?.success) {
+      window.location.reload();
+    }
+  } catch (error) {
+    console.log("Payment verification failed:", error);
+  }
+},
         theme:{
             color:"#4F46E5"
         }
