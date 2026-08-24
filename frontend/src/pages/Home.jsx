@@ -16,7 +16,6 @@ const Home = () => {
 
   const { userData } = useSelector((state) => state.user);
 
-  // Billing drawer state
   const [billingOpen, setBillingOpen] = useState(false);
 
   const handleLogin = async (token) => {
@@ -36,6 +35,7 @@ const Home = () => {
   const googleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
+
       const token = await result.user.getIdToken();
 
       await handleLogin(token);
@@ -45,29 +45,50 @@ const Home = () => {
   };
 
   return (
-    <div className="h-screen flex bg-black text-white overflow-hidden">
+    <div className="h-screen w-full flex bg-black text-white overflow-hidden">
+
+      {/* SIDEBAR */}
 
       <SideBar
         onBillingOpen={() => setBillingOpen(true)}
       />
 
-      <main className="flex-1 min-w-0 h-full">
+      {/* MAIN CHAT */}
+
+      <main className="flex-1 min-w-0 h-full pt-14 md:pt-0 overflow-hidden">
         <ChatArea />
       </main>
+
+      {/* ARTIFACT */}
 
       <Artifact />
 
       {/* BILLING DRAWER */}
+
       <BillingDrawer
         open={billingOpen}
         onClose={() => setBillingOpen(false)}
       />
 
       {/* LOGIN */}
-      {!userData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
 
-          <div className="w-[340px] bg-[#13151c] border border-white/[0.08] rounded-2xl p-7 flex flex-col gap-5">
+      {!userData && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+
+          <div
+            className="
+              w-[340px]
+              max-w-full
+              bg-[#13151c]
+              border border-white/[0.08]
+              rounded-2xl
+              p-7
+              flex flex-col
+              gap-5
+            "
+          >
+
+            {/* TITLE */}
 
             <div className="flex flex-col gap-1">
 
@@ -81,11 +102,27 @@ const Home = () => {
 
             </div>
 
+            {/* GOOGLE LOGIN */}
+
             <button
               onClick={googleLogin}
-              className="w-full flex items-center justify-center gap-3 py-[11px] rounded-xl text-sm font-medium text-black bg-white hover:bg-gray-200 transition-all duration-150 cursor-pointer"
+              className="
+                w-full
+                flex items-center justify-center gap-3
+                py-[11px]
+                rounded-xl
+                text-sm
+                font-medium
+                text-black
+                bg-white
+                hover:bg-gray-200
+                transition-all
+                duration-150
+                cursor-pointer
+              "
             >
               <FcGoogle size={18} />
+
               Continue with Google
             </button>
 
@@ -98,4 +135,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Home; 
